@@ -20,7 +20,7 @@ interface GooeyScope {
     fun Modifier.gooey(
         tension: Float,
         color: Color,
-        shape: GooeyDirection = GooeyDirection.Circle
+        direction: GooeyDirection = GooeyDirection.Circle
     ): Modifier
 
     @Stable
