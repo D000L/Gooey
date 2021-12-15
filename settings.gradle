@@ -7,4 +7,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "gooey"
-include ':app'
+include ':sample'
+include ':gooey'
