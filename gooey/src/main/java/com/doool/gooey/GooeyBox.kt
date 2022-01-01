@@ -2,60 +2,59 @@ package com.doool.gooey
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.withSaveLayer
 
-private const val Contrast = 48f
-private const val Brightness = 10000f
+internal val Gooey2ColorFilter = run {
+    val contrast = 48f
+    val brightness = 10000f
 
-private val ColorMatrix = ColorMatrix(
-    floatArrayOf(
-        1f, 0f, 0f, 0f, 0f,
-        0f, 1f, 0f, 0f, 0f,
-        0f, 0f, 1f, 0f, 0f,
-        0f, 0f, 0f, Contrast, -Brightness
+    ColorFilter.colorMatrix(
+        ColorMatrix(
+            floatArrayOf(
+                1f, 0f, 0f, 0f, 0f,
+                0f, 1f, 0f, 0f, 0f,
+                0f, 0f, 1f, 0f, 0f,
+                0f, 0f, 0f, contrast, -brightness
+            )
+        )
     )
-)
-
-private val GooeyColorFilter = ColorFilter.colorMatrix(ColorMatrix)
+}
 
 @Composable
-fun GooeyBox(
-    modifier: Modifier = Modifier,
-    frame: Int = 60,
-    activeGooey: Boolean = true,
-    content: @Composable GooeyScope.() -> Unit
-) {
-    val scope = remember(activeGooey) { GooeyScopeImpl(activeGooey) }
+fun GooeyBox(modifier: Modifier = Modifier, content: @Composable GooeyScope.() -> Unit) {
+    val scope = remember { GooeyScopeImpl() }
 
-    var scanView: ScanView? by remember { mutableStateOf(null) }
-    val image = scanView?.getScanState()
+    Box(
+        modifier
+            .fillMaxSize()
+            .then(GooeyBoxModifier())
+    ) {
+        content(scope)
+    }
+}
 
-    val modifier = if (activeGooey) modifier.drawWithContent {
-        image?.value?.let {
-            drawImage(it, Offset.Zero, colorFilter = GooeyColorFilter)
-        }
-    } else modifier
+internal class GooeyBoxModifier : DrawModifier {
+    private val paint = Paint().apply {
+        colorFilter = Gooey2ColorFilter
+    }
 
-    Box(modifier) {
-        if (activeGooey) {
-            AndroidView(modifier = Modifier.fillMaxSize(), factory = {
-                ScanView(it).apply {
-                    setTarget(
-                        frame = frame,
-                        target = { scope.content() }
-                    )
-
-                    scanView = this
-                }
-            })
-        } else {
-            scope.content()
+    override fun ContentDrawScope.draw() {
+        drawIntoCanvas { canvas ->
+            canvas.withSaveLayer(Rect(Offset.Zero, size), paint) {
+                drawContent()
+            }
         }
     }
 }
