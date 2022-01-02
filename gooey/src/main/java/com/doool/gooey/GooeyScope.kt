@@ -2,6 +2,7 @@ package com.doool.gooey
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.toSize
 
 @LayoutScopeMarker
 @Immutable
-interface GooeyScope {
+interface GooeyScope : BoxScope {
 
     fun Modifier.gooey(
         color: Color,
@@ -29,7 +30,7 @@ interface GooeyScope {
     ): Modifier
 }
 
-internal class GooeyScopeImpl : GooeyScope {
+internal class GooeyScopeImpl(boxScope: BoxScope) : GooeyScope, BoxScope by boxScope {
 
     override fun Modifier.gooey(
         color: Color,
@@ -45,7 +46,8 @@ internal class GooeyScopeImpl : GooeyScope {
             remember {
                 Modifier
                     .onSizeChanged { size = it.toSize() }
-                    .clickable(false) { } }
+                    .clickable(false) { }
+            }
         val gooeyModifier = remember(path, color) { GooeyModifier(path, color) }
 
         this

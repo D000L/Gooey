@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Paint
@@ -34,14 +33,11 @@ internal val Gooey2ColorFilter = run {
 
 @Composable
 fun GooeyBox(modifier: Modifier = Modifier, content: @Composable GooeyScope.() -> Unit) {
-    val scope = remember { GooeyScopeImpl() }
-
-    Box(
-        modifier
-            .fillMaxSize()
-            .then(GooeyBoxModifier())
-    ) {
-        content(scope)
+    Box(Modifier.fillMaxSize()) {
+        Box(modifier.then(GooeyBoxModifier())) {
+            val scope = remember { GooeyScopeImpl(this) }
+            content(scope)
+        }
     }
 }
 
