@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.withSaveLayer
 
-sealed class GooeyIntensity(val intensity: Float, val alpha: Float = 48f, val shift: Float = -10000f) {
+sealed class GooeyIntensity(val intensity: Float, val alpha: Float = intensity * 4f, val shift: Float = -250f * intensity) {
     object Low : GooeyIntensity(10f)
     object Medium : GooeyIntensity(20f)
     object High : GooeyIntensity(40f)
