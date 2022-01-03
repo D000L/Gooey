@@ -1,5 +1,6 @@
 package com.doool.gooey
 
+import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -15,35 +16,47 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.withSaveLayer
 
-internal val Gooey2ColorFilter = run {
-    val contrast = 48f
-    val brightness = 10000f
-
-    ColorFilter.colorMatrix(
-        ColorMatrix(
-            floatArrayOf(
-                1f, 0f, 0f, 0f, 0f,
-                0f, 1f, 0f, 0f, 0f,
-                0f, 0f, 1f, 0f, 0f,
-                0f, 0f, 0f, contrast, -brightness
-            )
-        )
-    )
+sealed class GooeyIntensity(val intensity: Float, val alpha: Float = 48f, val shift: Float = -10000f) {
+    object Low : GooeyIntensity(10f)
+    object Medium : GooeyIntensity(20f)
+    object High : GooeyIntensity(40f)
+    class Custom(intensity: Float, alpha: Float, shift: Float) : GooeyIntensity(intensity,alpha, shift)
 }
 
 @Composable
-fun GooeyBox(modifier: Modifier = Modifier, content: @Composable GooeyScope.() -> Unit) {
-    Box(Modifier.fillMaxSize()) {
-        Box(modifier.then(GooeyBoxModifier())) {
-            val scope = remember { GooeyScopeImpl(this) }
+fun GooeyBox(
+    modifier: Modifier = Modifier,
+    intensity: GooeyIntensity = GooeyIntensity.Medium,
+    content: @Composable GooeyScope.() -> Unit
+) {
+    val gooeyModifier =
+        remember(intensity) { GooeyBoxModifier(intensity) }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .then(gooeyModifier)
+    ) {
+        Box(modifier) {
+            val scope =
+                remember(intensity.intensity) { GooeyScopeImpl(this, intensity.intensity) }
             content(scope)
         }
     }
 }
 
-internal class GooeyBoxModifier : DrawModifier {
+internal class GooeyBoxModifier(intensity: GooeyIntensity) : DrawModifier {
     private val paint = Paint().apply {
-        colorFilter = Gooey2ColorFilter
+        colorFilter = ColorFilter.colorMatrix(
+            ColorMatrix(
+                floatArrayOf(
+                    1f, 0f, 0f, 0f, 0f,
+                    0f, 1f, 0f, 0f, 0f,
+                    0f, 0f, 1f, 0f, 0f,
+                    0f, 0f, 0f, intensity.alpha, intensity.shift
+                )
+            )
+        )
     }
 
     override fun ContentDrawScope.draw() {
@@ -53,4 +66,11 @@ internal class GooeyBoxModifier : DrawModifier {
             }
         }
     }
+}
+
+internal fun createBlurPaint(
+    intensity: Float,
+    blurType: BlurMaskFilter.Blur = BlurMaskFilter.Blur.NORMAL
+) = Paint().apply {
+    asFrameworkPaint().maskFilter = BlurMaskFilter(intensity, blurType)
 }

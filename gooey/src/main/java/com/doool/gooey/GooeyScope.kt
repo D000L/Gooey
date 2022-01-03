@@ -4,74 +4,93 @@ import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.LayoutScopeMarker
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.toSize
 
 @LayoutScopeMarker
 @Immutable
 interface GooeyScope : BoxScope {
 
+    val intensity: Float
+
     fun Modifier.gooey(
         color: Color,
-        shape: GooeyShape
+        shape: Shape,
+        solidShape: Boolean = false
     ): Modifier
 }
 
-internal class GooeyScopeImpl(boxScope: BoxScope) : GooeyScope, BoxScope by boxScope {
+internal class GooeyScopeImpl(boxScope: BoxScope, override val intensity: Float) : GooeyScope,
+    BoxScope by boxScope {
 
     override fun Modifier.gooey(
         color: Color,
-        shape: GooeyShape
+        shape: Shape,
+        solidShape: Boolean
     ): Modifier = composed {
         val layoutDirection = LocalLayoutDirection.current
         val density = LocalDensity.current
 
-        var size by remember { mutableStateOf(Size.Zero) }
-        val path = remember(size) { shape.createPath(size, layoutDirection, density) }
+        val gooeyModifier =
+            remember(color, intensity, solidShape) { GooeyModifier(color, intensity, solidShape) }
 
         val sizeAndClickModifier =
             remember {
                 Modifier
-                    .onSizeChanged { size = it.toSize() }
+                    .onSizeChanged { size ->
+                        gooeyModifier.updatePath(Path().apply {
+                            val size =
+                                Size(width = size.width.toFloat(), height = size.height.toFloat())
+
+                            addOutline(shape.createOutline(size, layoutDirection, density))
+                        })
+                    }
                     .clickable(false) { }
             }
-        val gooeyModifier = remember(path, color) { GooeyModifier(path, color) }
 
         this
             .then(sizeAndClickModifier)
             .then(gooeyModifier)
-            .clip(shape.graphicShape)
+            .clip(shape)
     }
 }
 
-internal val BlurPaint = Paint().apply {
-    asFrameworkPaint().maskFilter = BlurMaskFilter(10f, BlurMaskFilter.Blur.NORMAL)
-}
-
 internal class GooeyModifier(
-    private val path: Path,
-    private val color: Color
+    private val color: Color,
+    intensity: Float,
+    solidShape: Boolean = false
 ) : DrawModifier {
+
+    private var path = Path()
+    private val blurPaint = createBlurPaint(
+        intensity,
+        if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
+    ).apply {
+        this.color = this@GooeyModifier.color
+    }
 
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
-            canvas.drawPath(path, BlurPaint.apply {
-                this.color = this@GooeyModifier.color
-            })
+            canvas.drawPath(path, blurPaint)
             drawContent()
         }
+    }
+
+    fun updatePath(path: Path) {
+        this.path = path
     }
 }
