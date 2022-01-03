@@ -5,6 +5,10 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+        }
+    }
     compileSdk 31
 
     defaultConfig {
@@ -53,9 +57,9 @@ afterEvaluate {
             release(MavenPublication){
                 from components.release
 
-                groupId = 'com.doool.gooey'
-                artifactId = 'gooey'
-                version = '0.0.1'
+                groupId = 'com.D000L'
+                artifactId = 'Gooey'
+                version = '0.0.3'
             }
         }
     }
