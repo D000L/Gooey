@@ -57,9 +57,9 @@ afterEvaluate {
             release(MavenPublication){
                 from components.release
 
-                groupId = 'com.doool'
-                artifactId = 'gooey'
-                version = '0.0.1'
+                groupId = 'com.D000L'
+                artifactId = 'Gooey'
+                version = '0.0.3'
             }
         }
     }
