@@ -44,10 +44,9 @@ fun GooeyBox(
         Modifier
             .fillMaxSize()
             .then(gooeyModifier),
-        contentAlignment,
-        propagateMinConstraints
+        propagateMinConstraints = propagateMinConstraints
     ) {
-        Box(modifier) {
+        Box(modifier, contentAlignment, propagateMinConstraints) {
             val scope =
                 remember(intensity.intensity) { GooeyScopeImpl(this, intensity.intensity) }
             content(scope)
