@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
@@ -16,17 +17,24 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.withSaveLayer
 
-sealed class GooeyIntensity(val intensity: Float, val alpha: Float = intensity * 4f, val shift: Float = -250f * intensity) {
+sealed class GooeyIntensity(
+    val intensity: Float,
+    val alpha: Float = intensity * 4f,
+    val shift: Float = -250f * intensity
+) {
     object Low : GooeyIntensity(10f)
     object Medium : GooeyIntensity(20f)
     object High : GooeyIntensity(40f)
-    class Custom(intensity: Float, alpha: Float, shift: Float) : GooeyIntensity(intensity,alpha, shift)
+    class Custom(intensity: Float, alpha: Float, shift: Float) :
+        GooeyIntensity(intensity, alpha, shift)
 }
 
 @Composable
 fun GooeyBox(
     modifier: Modifier = Modifier,
     intensity: GooeyIntensity = GooeyIntensity.Medium,
+    contentAlignment: Alignment = Alignment.TopStart,
+    propagateMinConstraints: Boolean = false,
     content: @Composable GooeyScope.() -> Unit
 ) {
     val gooeyModifier =
@@ -35,7 +43,9 @@ fun GooeyBox(
     Box(
         Modifier
             .fillMaxSize()
-            .then(gooeyModifier)
+            .then(gooeyModifier),
+        contentAlignment,
+        propagateMinConstraints
     ) {
         Box(modifier) {
             val scope =
