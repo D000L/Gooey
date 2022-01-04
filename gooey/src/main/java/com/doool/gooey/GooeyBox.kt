@@ -44,6 +44,7 @@ fun GooeyBox(
         Modifier
             .fillMaxSize()
             .then(gooeyModifier),
+        contentAlignment = Alignment.Center,
         propagateMinConstraints = propagateMinConstraints
     ) {
         Box(modifier, contentAlignment, propagateMinConstraints) {
