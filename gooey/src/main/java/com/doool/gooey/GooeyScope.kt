@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -45,11 +46,18 @@ internal class GooeyScopeImpl(boxScope: BoxScope, override val intensity: Float)
         val layoutDirection = LocalLayoutDirection.current
         val density = LocalDensity.current
 
-        val gooeyModifier =
-            remember(color, intensity, solidShape) { GooeyModifier(color, intensity, solidShape) }
+        val gooeyModifier = remember { GooeyModifier(color, intensity, solidShape) }
+
+        LaunchedEffect(key1 = color, block = {
+            gooeyModifier.updateColor(color)
+        })
+
+        LaunchedEffect(key1 = shape,key2=  solidShape){
+            gooeyModifier.updateBlur(intensity, solidShape)
+        }
 
         val sizeAndClickModifier =
-            remember {
+            remember(gooeyModifier) {
                 Modifier
                     .onSizeChanged { size ->
                         gooeyModifier.updatePath(Path().apply {
@@ -70,18 +78,21 @@ internal class GooeyScopeImpl(boxScope: BoxScope, override val intensity: Float)
 }
 
 internal class GooeyModifier(
-    private val color: Color,
+    color: Color,
     intensity: Float,
     solidShape: Boolean = false
 ) : DrawModifier {
 
+    init {
+        updateBlur(intensity, solidShape)
+        updateColor(color)
+    }
+
     private var path = Path()
-    private val blurPaint = createBlurPaint(
+    private var blurPaint = createBlurPaint(
         intensity,
         if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
-    ).apply {
-        this.color = this@GooeyModifier.color
-    }
+    )
 
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
@@ -92,5 +103,16 @@ internal class GooeyModifier(
 
     fun updatePath(path: Path) {
         this.path = path
+    }
+
+    fun updateColor(color: Color) {
+        blurPaint.color = color
+    }
+
+    fun updateBlur(intensity: Float, solidShape: Boolean) {
+        blurPaint = createBlurPaint(
+            intensity,
+            if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
+        )
     }
 }
