@@ -1,15 +1,14 @@
-# Gooey
-
 <p align="center">
 <h1 align="center">Gooey effect for android-compose</h1>
 </p>
-What is 'Gooey Effect'
 
 <p align="center">
-  <img src="previews/sample1.webm" width="33%">
-  <img src="previews/sample2.webm" width="33%">
-  <img src="previews/sample3.webm" width="33%">
+  <img src="previews/sample1.gif" width="33%">
+  <img src="previews/sample2.gif" width="33%">
+  <img src="previews/sample3.gif" width="33%">
 </p>
+
+"Gooey" is a library made to use "gooey-effect" that exists as a CSS trick in android-compose.
 
 ## Download
 ```gradle
