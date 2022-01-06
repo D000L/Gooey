@@ -25,10 +25,12 @@ fun CircleRotation(modifier: Modifier = Modifier) {
     GooeyBox(modifier, intensity = GooeyIntensity.High) {
         val positions = remember { mutableStateListOf<Offset>() }
         val pivots = remember { mutableStateListOf<Offset>() }
+        val rotates = remember { mutableStateListOf<Float>() }
 
         for (i in 0..3) {
             positions.add(RandomOffset() * 200f - Offset(100f, 100f))
             pivots.add(RandomOffset() * 1f - Offset(0.5f, 0.5f))
+            rotates.add(90f*i)
         }
 
         LaunchedEffect(Unit) {
@@ -38,6 +40,9 @@ fun CircleRotation(modifier: Modifier = Modifier) {
                         if (it % 10 == Random.nextLong(10)) {
                             positions[i] = RandomOffset() * 200f - Offset(100f, 100f)
                             pivots[i] = RandomOffset() * 0.4f - Offset(0.2f, 0.2f)
+                        }
+                        if (it % 20 == Random.nextLong(20)) {
+                            rotates[i] = Random.nextFloat() * 720f - 360f
                         }
                     }
                 }
@@ -53,17 +58,18 @@ fun CircleRotation(modifier: Modifier = Modifier) {
             )
         )
 
-        val colors = remember { listOf(Color.Red, Color.Blue, Color.Green, Color.Magenta) }
+        val colors = remember { listOf(Color.Red,  Color.Blue, Color.Green, Color.Magenta) }
 
         for (i in 0..3) {
             val position by animateOffsetAsState(targetValue = positions[i], tween(2000))
             val pivot by animateOffsetAsState(targetValue = pivots[i], tween(2000))
+            val rotate by animateFloatAsState(targetValue = rotates[i], tween(2000))
 
             Box(
                 modifier = Modifier
                     .size(30.dp + 20.dp.times(i))
                     .graphicsLayer(
-                        rotationZ = progress,
+                        rotationZ = progress + rotate,
                         translationX = position.x,
                         translationY = position.y,
                         transformOrigin = TransformOrigin(pivot.x, pivot.x)

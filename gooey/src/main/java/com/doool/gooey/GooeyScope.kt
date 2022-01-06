@@ -46,11 +46,8 @@ internal class GooeyScopeImpl(boxScope: BoxScope, override val intensity: Float)
         val layoutDirection = LocalLayoutDirection.current
         val density = LocalDensity.current
 
-        val gooeyModifier = remember { GooeyModifier(color, intensity, solidShape) }
-
-        LaunchedEffect(key1 = shape, key2 = solidShape){
-            gooeyModifier.updateBlur(intensity, solidShape)
-        }
+        val gooeyModifier =
+            remember(intensity, solidShape) { GooeyModifier(color, intensity, solidShape) }
 
         LaunchedEffect(key1 = color, block = {
             gooeyModifier.updateColor(color)
@@ -83,20 +80,19 @@ internal class GooeyModifier(
     solidShape: Boolean = false
 ) : DrawModifier {
 
-    init {
-        updateBlur(intensity, solidShape)
-    }
+    private var currentColor: Color = color
 
     private var path = Path()
     private var blurPaint = createBlurPaint(
         intensity,
         if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
     )
-    private var currentColor : Color = color
 
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
-            canvas.drawPath(path, blurPaint)
+            canvas.drawPath(path, blurPaint.apply {
+                color = currentColor
+            })
             drawContent()
         }
     }
@@ -107,15 +103,5 @@ internal class GooeyModifier(
 
     fun updateColor(color: Color) {
         currentColor = color
-        blurPaint.color = color
-    }
-
-    fun updateBlur(intensity: Float, solidShape: Boolean) {
-        blurPaint = createBlurPaint(
-            intensity,
-            if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
-        ).apply {
-            color = currentColor
-        }
     }
 }

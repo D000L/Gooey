@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -51,15 +52,18 @@ class Blob(originX: Float, originY: Float, val key: Int) {
 
 @Composable
 fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
-    var current by remember { mutableStateOf(Offset(250f, 250f)) }
-    val blobs = remember { mutableStateListOf<Blob>() }
-    var key = remember { 0 }
 
     BoxWithConstraints(Modifier.background(Color(0xff102132))) {
         val density = LocalDensity.current
 
         val width = with(density) { maxWidth.toPx() }
         val height = with(density) { maxHeight.toPx() }
+
+        var current by remember { mutableStateOf(Offset(width / 2f, height / 2f)) }
+        val blobs = remember { mutableStateListOf<Blob>() }
+        var key = remember { 0 }
+
+        Text(text = "Drag It", color = Color.White)
 
         LaunchedEffect(key1 = Unit, block = {
             while (true) {
