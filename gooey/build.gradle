@@ -9,11 +9,11 @@ android {
         release {
         }
     }
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         minSdk 24
-        targetSdk 31
+        targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -33,7 +33,6 @@ android {
 
     kotlinOptions {
         jvmTarget = '11'
-        useIR = true
     }
 
     buildFeatures {
@@ -42,7 +41,7 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.5.31'
+        kotlinCompilerVersion kotlin_version
     }
 }
 
