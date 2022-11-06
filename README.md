@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.github.D000L:gooey:0.1.0'
+  implementation 'com.github.D000L:gooey:0.1.1'
 }
 ```
 

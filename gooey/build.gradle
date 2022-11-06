@@ -58,7 +58,7 @@ afterEvaluate {
 
                 groupId = 'com.D000L'
                 artifactId = 'Gooey'
-                version = '0.1.0'
+                version = '0.1.1'
             }
         }
     }
