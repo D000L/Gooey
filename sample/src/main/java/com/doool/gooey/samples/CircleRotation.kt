@@ -2,27 +2,33 @@ package com.doool.gooey.samples
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.doool.gooey.GooeyBox
-import com.doool.gooey.GooeyIntensity
+import com.doool.gooey.gooeyBackground
+import com.doool.gooey.gooeyEffect
 import kotlin.random.Random
 
 fun RandomOffset() = Offset(
-    Random.nextFloat(),
-    Random.nextFloat()
+    Random.nextFloat(), Random.nextFloat()
 )
 
 @Composable
 fun CircleRotation(modifier: Modifier = Modifier) {
-    GooeyBox(modifier, intensity = GooeyIntensity.High) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .gooeyEffect(),
+        contentAlignment = Alignment.Center
+    ) {
         val positions = remember { mutableStateListOf<Offset>() }
         val pivots = remember { mutableStateListOf<Offset>() }
         val rotates = remember { mutableStateListOf<Float>() }
@@ -30,7 +36,7 @@ fun CircleRotation(modifier: Modifier = Modifier) {
         for (i in 0..3) {
             positions.add(RandomOffset() * 200f - Offset(100f, 100f))
             pivots.add(RandomOffset() * 1f - Offset(0.5f, 0.5f))
-            rotates.add(90f*i)
+            rotates.add(90f * i)
         }
 
         LaunchedEffect(Unit) {
@@ -50,15 +56,12 @@ fun CircleRotation(modifier: Modifier = Modifier) {
         }
 
         val progress by rememberInfiniteTransition().animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                tween(2000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
+            initialValue = 0f, targetValue = 360f, animationSpec = infiniteRepeatable(
+                tween(2000, easing = LinearEasing), repeatMode = RepeatMode.Restart
             )
         )
 
-        val colors = remember { listOf(Color.Red,  Color.Blue, Color.Green, Color.Magenta) }
+        val colors = remember { listOf(Color.Red, Color.Blue, Color.Green, Color.Magenta) }
 
         for (i in 0..3) {
             val position by animateOffsetAsState(targetValue = positions[i], tween(2000))
@@ -74,9 +77,8 @@ fun CircleRotation(modifier: Modifier = Modifier) {
                         translationY = position.y,
                         transformOrigin = TransformOrigin(pivot.x, pivot.x)
                     )
-                    .gooey(
-                        shape = CircleShape,
-                        color = colors[i]
+                    .gooeyBackground(
+                        shape = CircleShape, color = colors[i]
                     )
             )
         }

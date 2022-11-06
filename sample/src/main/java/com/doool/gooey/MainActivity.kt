@@ -1,7 +1,9 @@
 package com.doool.gooey
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,10 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.doool.gooey.samples.CircleRotation
-import com.doool.gooey.samples.GooeyEffectButton
+import com.doool.gooey.samples.GooeyLoading
 import com.doool.gooey.samples.RandomGooeyBubbleCanvas
 
 class MainActivity : AppCompatActivity() {
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,8 +40,7 @@ class MainActivity : AppCompatActivity() {
                                 .padding(horizontal = 4.dp)
                                 .clickable {
                                     select = it
-                                }
-                        ) {
+                                }) {
                             Text("Sample $it")
                         }
                     }
@@ -47,11 +49,10 @@ class MainActivity : AppCompatActivity() {
                     when (select) {
                         0 -> RandomGooeyBubbleCanvas(Modifier.align(Alignment.Center))
                         1 -> CircleRotation(Modifier.align(Alignment.Center))
-                        2 -> GooeyEffectButton(Modifier.align(Alignment.Center))
+                        2 -> GooeyLoading(Modifier.align(Alignment.Center))
                     }
                 }
             }
         }
     }
 }
-

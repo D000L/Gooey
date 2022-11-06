@@ -3,21 +3,32 @@ package com.doool.gooey.samples
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.doool.gooey.GooeyBox
 import com.doool.gooey.GooeyCanvas
+import com.doool.gooey.gooeyBackground
+import com.doool.gooey.gooeyEffect
 import kotlin.random.Random
 
 /*
@@ -77,42 +88,36 @@ fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
             }
         })
 
-        GooeyBox(
+        Box(
             modifier
                 .fillMaxSize()
                 .pointerInput("Input") {
-                    detectDragGestures(
-                        onDragStart = {
-                            current = it
-                        }
-                    ) { change, dragAmount ->
+                    detectDragGestures(onDragStart = {
+                        current = it
+                    }) { change, dragAmount ->
                         current += dragAmount
                     }
-                }) {
+                }
+                .gooeyEffect()) {
             GooeyCanvas(modifier = Modifier, onDraw = {
-                drawIntoCanvas { canvas ->
-                    blobs.forEach {
-                        canvas.drawGooey(
-                            Size(
-                                with(density) { it.radius.dp.toPx() },
-                                with(density) { it.radius.dp.toPx() }),
-                            Color(it.color),
-                            CircleShape,
-                            Offset(it.x, it.y)
-                        )
-                    }
+                blobs.forEach {
+                    drawGooey(
+                        Size(with(density) { it.radius.dp.toPx() },
+                            with(density) { it.radius.dp.toPx() }),
+                        Color(it.color),
+                        CircleShape,
+                        Offset(it.x, it.y)
+                    )
                 }
             })
 
             Box(
                 Modifier
                     .size(80.dp)
-                    .offset(
-                        with(density) { current.x.toDp() - 40.dp },
+                    .offset(with(density) { current.x.toDp() - 40.dp },
                         with(density) { current.y.toDp() - 40.dp })
-                    .gooey(
-                        Color(0xffffdd02),
-                        CircleShape
+                    .gooeyBackground(
+                        Color(0xffffdd02), CircleShape
                     )
             )
         }
@@ -143,22 +148,24 @@ fun RandomGooeyBubble(modifier: Modifier = Modifier) {
             }
         })
 
-        GooeyBox(modifier.pointerInput("Input") {
-            detectDragGestures(
-                onDragStart = {
-                    current = it
+        Box(
+            modifier
+                .fillMaxSize()
+                .pointerInput("Input") {
+                    detectDragGestures(onDragStart = {
+                        current = it
+                    }) { change, dragAmount ->
+                        current += dragAmount
+                    }
                 }
-            ) { change, dragAmount ->
-                current += dragAmount
-            }
-        }) {
+                .gooeyEffect()) {
             blobs.forEach {
                 key(it.key) {
                     Box(
                         Modifier
                             .graphicsLayer(translationX = it.x, translationY = it.y)
                             .size(it.radius.dp)
-                            .gooey(Color(it.color), CircleShape)
+                            .gooeyBackground(Color(it.color), CircleShape)
                     )
                 }
             }
@@ -166,12 +173,10 @@ fun RandomGooeyBubble(modifier: Modifier = Modifier) {
             Box(
                 Modifier
                     .size(80.dp)
-                    .offset(
-                        with(density) { current.x.toDp() - 40.dp },
+                    .offset(with(density) { current.x.toDp() - 40.dp },
                         with(density) { current.y.toDp() - 40.dp })
-                    .gooey(
-                        Color.Green,
-                        CircleShape
+                    .gooeyBackground(
+                        Color.Green, CircleShape
                     )
             )
         }
