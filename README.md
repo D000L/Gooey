@@ -24,11 +24,11 @@ dependencies {
 
 ## Usage
 
-1. Change parent layout to "GooeyBox"
+1. Apply "gooeyEffect" Modifier
 2. Change 'background' to 'gooey' in the child layout to apply "gooey-effect"
 
 ```kotlin
-GooeyBox(contentAlignment = Alignment.Center, intensity = GooeyIntensity.High) {
+Box(modifier = Modifier.gooeyEffect(), contentAlignment = Alignment.Center) {
     for (i in 0 until 3) {
         Box(
             modifier = Modifier
@@ -55,7 +55,7 @@ GooeyBox() {
     GooeyCanvas(modifier = Modifier, onDraw = {
         drawIntoCanvas { canvas ->
             blobs.forEach {
-                canvas.drawGooey(
+                drawGooey(
                     Size(
                         with(density) { it.radius.dp.toPx() },
                         with(density) { it.radius.dp.toPx() }),
