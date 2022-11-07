@@ -1,12 +1,10 @@
 package com.doool.gooey
 
 import android.graphics.BlurMaskFilter
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -14,57 +12,48 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.layout.OnRemeasuredModifier
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.LayoutAwareModifierNode
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
-val LocalGooeyIntensity = compositionLocalOf { GooeyIntensity.Medium }
+@OptIn(ExperimentalComposeUiApi::class)
+fun Modifier.gooeyBackground(color: Color, shape: Shape, solidShape: Boolean = true) =
+    this.composed {
+        val intensity = LocalGooeyIntensity.current.intensity
+        val layoutDirection = LocalLayoutDirection.current
+        val density = LocalDensity.current
 
-fun Modifier.gooeyBackground(
-    color: Color,
-    shape: Shape,
-    solidShape: Boolean = true
-): Modifier = composed {
-    val intensity = LocalGooeyIntensity.current.intensity
-    val layoutDirection = LocalLayoutDirection.current
-    val density = LocalDensity.current
-
-    val gooeyModifier = remember(intensity, solidShape, layoutDirection, density) {
-        GooeyModifier(
-            color = color,
-            shape = shape,
-            layoutDirection = layoutDirection,
-            density = density,
-            intensity = intensity,
-            solidShape = solidShape
-        )
+        modifierElementOf(params = Pair(color, shape), create = {
+            GooeyModifierNode(
+                shape, layoutDirection, density, color, intensity, solidShape
+            )
+        }, update = {
+            it.gooeyColor = color
+        }, definitions = {
+            name = "gooeyBackgroundNode"
+            properties["color"] = color
+            properties["shape"] = shape
+            properties["solidShape"] = solidShape
+        })
     }
 
-    LaunchedEffect(key1 = color, block = {
-        gooeyModifier.updateColor(color)
-    })
-
-    then(gooeyModifier)
-}
-
-internal class GooeyModifier(
+@OptIn(ExperimentalComposeUiApi::class)
+class GooeyModifierNode(
     private val shape: Shape,
     private val layoutDirection: LayoutDirection,
     private val density: Density,
-    color: Color,
+    var gooeyColor: Color,
     intensity: Float,
     solidShape: Boolean = false
-) : DrawModifier, OnRemeasuredModifier {
-
-    private var currentColor: Color = color
-
+) : DrawModifierNode, LayoutAwareModifierNode, Modifier.Node() {
     private var path = Path()
     private var blurPaint = createBlurPaint(
-        intensity,
-        if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
+        intensity, if (solidShape) BlurMaskFilter.Blur.SOLID else BlurMaskFilter.Blur.NORMAL
     )
 
     override fun onRemeasured(size: IntSize) {
@@ -77,13 +66,9 @@ internal class GooeyModifier(
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
             canvas.drawPath(path, blurPaint.apply {
-                color = currentColor
+                color = gooeyColor
             })
             drawContent()
         }
-    }
-
-    fun updateColor(color: Color) {
-        currentColor = color
     }
 }

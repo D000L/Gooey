@@ -26,27 +26,3 @@ fun Modifier.gooeyEffect(intensity: GooeyIntensity = GooeyIntensity.Medium): Mod
         this.then(GooeyColorFilterDrawModifier(intensity))
     }
 }
-
-
-@RequiresApi(Build.VERSION_CODES.S)
-fun createGooeyRenderEffect(): RenderEffect {
-    val colorFilter = ColorFilter.colorMatrix(
-        ColorMatrix(
-            floatArrayOf(
-                1f, 0f, 0f, 0f, 0f,
-                0f, 1f, 0f, 0f, 0f,
-                0f, 0f, 1f, 0f, 0f,
-                0f, 0f, 0f, 80f, -1000f
-            )
-        )
-    )
-
-    return android.graphics.RenderEffect.createColorFilterEffect(
-        colorFilter.asAndroidColorFilter(),
-        BlurEffect(
-            radiusX = 20f,
-            radiusY = 20f,
-            edgeTreatment = TileMode.Decal
-        ).asAndroidRenderEffect()
-    ).asComposeRenderEffect()
-}
