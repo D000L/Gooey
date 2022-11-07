@@ -34,13 +34,13 @@ Box(modifier = Modifier.gooeyEffect(), contentAlignment = Alignment.Center) {
             modifier = Modifier
             ...
             //.background(Color(0xFF4DFF94), shape = CircleShape)
-            .gooey(Color(0xFF4DFF94), shape = CircleShape)
+            .gooeyBackground(Color(0xFF4DFF94), shape = CircleShape)
         )
     }
     Box(
         modifier = Modifier
         ...
-        .gooey(Color(0xFFC4FF70), CircleShape)
+        .gooeyBackground(Color(0xFFC4FF70), CircleShape)
     )
 }
 ```
@@ -73,7 +73,7 @@ GooeyBox() {
             .offset(
                 with(density) { current.x.toDp() - 40.dp },
                 with(density) { current.y.toDp() - 40.dp })
-            .gooey(
+            .gooeyBackground(
                 Color(0xffffdd02),
                 CircleShape
             )
