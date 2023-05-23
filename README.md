@@ -51,19 +51,17 @@ To apply "gooey-effect" to many objects
 Use 'GooeyCanvas' and 'drawGooey'
 
 ```kotlin
-GooeyBox() {
+Box(modifier = Modifier.gooeyEffect()) {
     GooeyCanvas(modifier = Modifier, onDraw = {
-        drawIntoCanvas { canvas ->
-            blobs.forEach {
-                drawGooey(
-                    Size(
-                        with(density) { it.radius.dp.toPx() },
-                        with(density) { it.radius.dp.toPx() }),
-                    Color(it.color),
-                    CircleShape,
-                    Offset(it.x, it.y)
-                )
-            }
+        blobs.forEach {
+            drawGooey(
+                Size(
+                    with(density) { it.radius.dp.toPx() },
+                    with(density) { it.radius.dp.toPx() }),
+                Color(it.color),
+                CircleShape,
+                Offset(it.x, it.y)
+            )
         }
     })
 
