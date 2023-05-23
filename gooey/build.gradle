@@ -41,7 +41,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion kotlin_version
     }
 }
 
@@ -58,7 +57,7 @@ afterEvaluate {
 
                 groupId = 'com.D000L'
                 artifactId = 'Gooey'
-                version = '0.1.1'
+                version = '0.1.2'
             }
         }
     }
