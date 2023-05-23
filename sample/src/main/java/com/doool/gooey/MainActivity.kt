@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.doool.gooey.samples.CircleRotation
 import com.doool.gooey.samples.GooeyLoading
+import com.doool.gooey.samples.RandomGooeyBubble
 import com.doool.gooey.samples.RandomGooeyBubbleCanvas
 
 class MainActivity : AppCompatActivity() {

@@ -1,6 +1,7 @@
 package com.doool.gooey.samples
 
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -34,13 +35,12 @@ import kotlin.random.Random
 /*
  * design source from : https://codepen.io/mnmxmx/full/VjjvEq
  */
-class Blob(originX: Float, originY: Float, val key: Int) {
+class Blob(originX: Float, originY: Float) {
     companion object {
         val colors = listOf(0xffff1783, 0xff17c9ff, 0xff36ff40)
     }
 
-    var x by mutableStateOf(originX)
-    var y by mutableStateOf(originY)
+    var offset by mutableStateOf(Offset(originX,originY))
     var angle = Math.PI * 2 * Math.random()
     var vx = ((3f + Math.random() * 1f) * Math.cos(angle)).toFloat()
     var vy = ((3f + Math.random() * 1f) * Math.sin(angle)).toFloat()
@@ -48,14 +48,13 @@ class Blob(originX: Float, originY: Float, val key: Int) {
     var color = colors.random()
 
     fun update() {
-        x += vx
-        y += vy
+        offset = Offset(offset.x + vx, offset.y + vy)
         radius -= .05f
     }
 
     fun isEnd(width: Float, height: Float): Boolean {
-        if (x > width || x < 0) return true
-        if (y > height || y < 0) return true
+        if (offset.x > width || offset.x < 0) return true
+        if (offset.y > height || offset.y < 0) return true
         if (radius < 0) return true
         return false
     }
@@ -72,7 +71,6 @@ fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
 
         var current by remember { mutableStateOf(Offset(width / 2f, height / 2f)) }
         val blobs = remember { mutableStateListOf<Blob>() }
-        var key = remember { 0 }
 
         Text(text = "Drag It", color = Color.White)
 
@@ -80,7 +78,7 @@ fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
             while (true) {
                 withInfiniteAnimationFrameMillis {
                     if (Random.nextLong(3) == (it % 3L)) {
-                        blobs.add(Blob(current.x, current.y, key++))
+                        blobs.add(Blob(current.x, current.y))
                     }
                     blobs.forEach { it.update() }
                     blobs.removeAll { it.isEnd(width, height) }
@@ -106,7 +104,7 @@ fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
                             with(density) { it.radius.dp.toPx() }),
                         Color(it.color),
                         CircleShape,
-                        Offset(it.x, it.y)
+                        it.offset
                     )
                 }
             })
@@ -128,7 +126,6 @@ fun RandomGooeyBubbleCanvas(modifier: Modifier = Modifier) {
 fun RandomGooeyBubble(modifier: Modifier = Modifier) {
     var current by remember { mutableStateOf(Offset(250f, 250f)) }
     val blobs = remember { mutableStateListOf<Blob>() }
-    var key = remember { 0 }
 
     BoxWithConstraints() {
         val density = LocalDensity.current
@@ -140,7 +137,7 @@ fun RandomGooeyBubble(modifier: Modifier = Modifier) {
             while (true) {
                 withInfiniteAnimationFrameMillis {
                     if (Random.nextLong(5) == (it % 5L)) {
-                        blobs.add(Blob(current.x, current.y, key++))
+                        blobs.add(Blob(current.x, current.y))
                     }
                     blobs.forEach { it.update() }
                     blobs.removeAll { it.isEnd(width, height) }
@@ -160,14 +157,12 @@ fun RandomGooeyBubble(modifier: Modifier = Modifier) {
                 }
                 .gooeyEffect()) {
             blobs.forEach {
-                key(it.key) {
-                    Box(
-                        Modifier
-                            .graphicsLayer(translationX = it.x, translationY = it.y)
-                            .size(it.radius.dp)
-                            .gooeyBackground(Color(it.color), CircleShape)
-                    )
-                }
+                Box(
+                    Modifier
+                        .graphicsLayer(translationX = it.offset.x, translationY = it.offset.y)
+                        .size(it.radius.dp)
+                        .gooeyBackground(Color(it.color), CircleShape)
+                )
             }
 
             Box(

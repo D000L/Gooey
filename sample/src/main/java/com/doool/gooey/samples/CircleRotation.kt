@@ -38,7 +38,8 @@ fun CircleRotation(modifier: Modifier = Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .gooeyEffect(), contentAlignment = Alignment.Center
+            .gooeyEffect(),
+        contentAlignment = Alignment.Center
     ) {
         val positions = remember { mutableStateListOf<Offset>() }
         val pivots = remember { mutableStateListOf<Offset>() }

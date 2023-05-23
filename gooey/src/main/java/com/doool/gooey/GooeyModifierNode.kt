@@ -1,7 +1,6 @@
 package com.doool.gooey
 
 import android.graphics.BlurMaskFilter
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -14,36 +13,55 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutAwareModifierNode
-import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.gooeyBackground(color: Color, shape: Shape, solidShape: Boolean = true) =
     this.composed {
         val intensity = LocalGooeyIntensity.current.intensity
         val layoutDirection = LocalLayoutDirection.current
         val density = LocalDensity.current
 
-        modifierElementOf(params = Pair(color, shape), create = {
-            GooeyModifierNode(
-                shape, layoutDirection, density, color, intensity, solidShape
-            )
-        }, update = {
-            it.gooeyColor = color
-        }, definitions = {
-            name = "gooeyBackgroundNode"
-            properties["color"] = color
-            properties["shape"] = shape
-            properties["solidShape"] = solidShape
-        })
+        DrawBehindElement(
+            shape = shape,
+            layoutDirection = layoutDirection,
+            density = density,
+            gooeyColor = color,
+            intensity = intensity,
+            solidShape = solidShape
+        )
     }
 
 @OptIn(ExperimentalComposeUiApi::class)
-class GooeyModifierNode(
+private data class DrawBehindElement(
+    private val shape: Shape,
+    private val layoutDirection: LayoutDirection,
+    private val density: Density,
+    val gooeyColor: Color,
+    val intensity: Float,
+    val solidShape: Boolean = false
+) : ModifierNodeElement<GooeyModifierNode>() {
+    override fun create() =
+        GooeyModifierNode(shape, layoutDirection, density, gooeyColor, intensity, solidShape)
+
+    override fun update(node: GooeyModifierNode): GooeyModifierNode =
+        node.apply { gooeyColor = this@DrawBehindElement.gooeyColor }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "gooeyBackgroundNode"
+        properties["color"] = gooeyColor
+        properties["shape"] = shape
+        properties["solidShape"] = solidShape
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private class GooeyModifierNode(
     private val shape: Shape,
     private val layoutDirection: LayoutDirection,
     private val density: Density,
