@@ -42,6 +42,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+    namespace 'com.doool.gooey'
 }
 
 dependencies {
@@ -57,7 +58,13 @@ afterEvaluate {
 
                 groupId = 'com.D000L'
                 artifactId = 'Gooey'
-                version = '0.1.2'
+                version = '0.1.1'
+            }
+        }
+
+        repositories {
+            maven {
+                url "$buildDir/releases"
             }
         }
     }
