@@ -1,15 +1,12 @@
 package com.doool.gooey
 
+import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.LayoutScopeMarker
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -20,6 +17,14 @@ import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.Density
+
+internal fun createBlurPaint(
+    intensity: Float,
+    blurType: BlurMaskFilter.Blur = BlurMaskFilter.Blur.NORMAL
+) = Paint().apply {
+    asFrameworkPaint().maskFilter = BlurMaskFilter(intensity, blurType)
+}
+
 
 @Composable
 fun GooeyCanvas(modifier: Modifier = Modifier, onDraw: GooeyCanvasScope.() -> Unit) {
