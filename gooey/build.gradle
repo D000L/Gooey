@@ -61,11 +61,5 @@ afterEvaluate {
                 version = '0.1.1'
             }
         }
-
-        repositories {
-            maven {
-                url "$buildDir/releases"
-            }
-        }
     }
 }
